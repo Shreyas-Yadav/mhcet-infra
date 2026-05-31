@@ -13,7 +13,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "mhcet-tf-state"
+    bucket = "mhcet-tf-state-498018"
     prefix = "dev"
   }
 }
