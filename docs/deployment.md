@@ -118,7 +118,7 @@ Create a fine-grained PAT with **Actions: Read and write** on `mhcet-infra` only
 Configure on **`main`** in both repos (Settings → Branches → Add rule):
 
 - Require a pull request before merging
-- Require status checks: `backend-test`, `frontend-check`, `commitlint` (app repo); `plan` (infra repo)
+- Require status checks: `CI / backend-test`, `CI / frontend-check`, `Conventional Commits / commitlint` (app repo); `Terraform Plan / plan` (infra repo)
 - Do not allow bypassing (recommended)
 - Restrict direct pushes to `main`
 
@@ -128,9 +128,9 @@ Configure on **`main`** in both repos (Settings → Branches → Add rule):
 # App repo
 gh api repos/Shreyas-Yadav/mhcet/branches/main/protection -X PUT \
   -f required_status_checks[strict]=true \
-  -f required_status_checks[checks][][context]=backend-test \
-  -f required_status_checks[checks][][context]=frontend-check \
-  -f required_status_checks[checks][][context]=commitlint \
+  -f required_status_checks[checks][][context]="CI / backend-test" \
+  -f required_status_checks[checks][][context]="CI / frontend-check" \
+  -f required_status_checks[checks][][context]="Conventional Commits / commitlint" \
   -f enforce_admins=true \
   -f required_pull_request_reviews[required_approving_review_count]=1 \
   -f restrictions=null

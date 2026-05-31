@@ -14,9 +14,9 @@ protect_app_repo() {
   "required_status_checks": {
     "strict": true,
     "checks": [
-      {"context": "backend-test"},
-      {"context": "frontend-check"},
-      {"context": "commitlint"}
+      {"context": "CI / backend-test"},
+      {"context": "CI / frontend-check"},
+      {"context": "Conventional Commits / commitlint"}
     ]
   },
   "enforce_admins": true,
@@ -36,7 +36,7 @@ protect_infra_repo() {
   "required_status_checks": {
     "strict": true,
     "checks": [
-      {"context": "plan"}
+      {"context": "Terraform Plan / plan"}
     ]
   },
   "enforce_admins": true,
