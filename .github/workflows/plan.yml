@@ -46,12 +46,29 @@ jobs:
         working-directory: ${{ steps.env.outputs.working_dir }}
         run: terraform init -input=false
 
+      - name: Set plan variables
+        id: tfvars
+        run: |
+          if [ "${{ steps.env.outputs.environment }}" = "prod" ]; then
+            echo "frontend_domain=${{ vars.FRONTEND_DOMAIN_PROD }}" >> "$GITHUB_OUTPUT"
+            echo "backend_domain=${{ vars.BACKEND_DOMAIN_PROD }}" >> "$GITHUB_OUTPUT"
+            echo "cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_PROD }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend_domain=${{ vars.FRONTEND_DOMAIN_DEV }}" >> "$GITHUB_OUTPUT"
+            echo "backend_domain=${{ vars.BACKEND_DOMAIN_DEV }}" >> "$GITHUB_OUTPUT"
+            echo "cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_DEV }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Terraform Plan
         id: plan
         working-directory: ${{ steps.env.outputs.working_dir }}
         run: |
           terraform plan -input=false -no-color \
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION }}" \
+            -var="frontend_domain=${{ steps.tfvars.outputs.frontend_domain }}" \
+            -var="backend_domain=${{ steps.tfvars.outputs.backend_domain }}" \
+            -var="cors_allowed_origins=${{ steps.tfvars.outputs.cors_allowed_origins }}" \
             -var="backend_image=${{ vars.PLAN_BACKEND_IMAGE }}" \
             -var="frontend_image=${{ vars.PLAN_FRONTEND_IMAGE }}" \
             -out=tfplan 2>&1 | tee plan.txt

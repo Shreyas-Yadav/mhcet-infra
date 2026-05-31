@@ -64,6 +64,10 @@ jobs:
           terraform init -input=false
           terraform apply -input=false -auto-approve \
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION }}" \
+            -var="frontend_domain=${{ vars.FRONTEND_DOMAIN_PROD }}" \
+            -var="backend_domain=${{ vars.BACKEND_DOMAIN_PROD }}" \
+            -var="cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_PROD }}" \
             -var="backend_image=${{ steps.images.outputs.backend }}" \
             -var="frontend_image=${{ steps.images.outputs.frontend }}"
 
@@ -97,5 +101,9 @@ jobs:
           terraform init -input=false
           terraform apply -input=false -auto-approve \
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION }}" \
+            -var="frontend_domain=${{ vars.FRONTEND_DOMAIN_PROD }}" \
+            -var="backend_domain=${{ vars.BACKEND_DOMAIN_PROD }}" \
+            -var="cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_PROD }}" \
             -var="backend_image=${{ vars.CURRENT_BACKEND_IMAGE_PROD }}" \
             -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_PROD }}"

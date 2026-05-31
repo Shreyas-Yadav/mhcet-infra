@@ -58,6 +58,10 @@ jobs:
           terraform init -input=false
           terraform apply -input=false -auto-approve \
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION }}" \
+            -var="frontend_domain=${{ vars.FRONTEND_DOMAIN_DEV }}" \
+            -var="backend_domain=${{ vars.BACKEND_DOMAIN_DEV }}" \
+            -var="cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_DEV }}" \
             -var="backend_image=${{ steps.images.outputs.backend }}" \
             -var="frontend_image=${{ steps.images.outputs.frontend }}"
 
