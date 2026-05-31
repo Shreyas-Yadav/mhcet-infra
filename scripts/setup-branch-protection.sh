@@ -1,27 +1,41 @@
 #!/usr/bin/env bash
-# Configure branch protection on main for both mhcet and mhcet-infra repos.
-# Requires: gh CLI authenticated with admin access.
+# Configure branch protection and GitHub environments for both repos.
 set -euo pipefail
 
 GITHUB_ORG="${GITHUB_ORG:-Shreyas-Yadav}"
 APP_REPO="${APP_REPO:-mhcet}"
 INFRA_REPO="${INFRA_REPO:-mhcet-infra}"
 
-protect_app_repo() {
-  if ! gh api "repos/${GITHUB_ORG}/${APP_REPO}/branches/main" >/dev/null 2>&1; then
-    echo "Skip ${APP_REPO}/main — branch does not exist yet."
-    return 0
-  fi
-  gh api "repos/${GITHUB_ORG}/${APP_REPO}/branches/main/protection" -X PUT \
-    --input - <<EOF
+create_environment() {
+  local repo=$1
+  local env=$2
+  gh api "repos/${GITHUB_ORG}/${repo}/environments/${env}" -X PUT --input - <<EOF
+{"wait_timer": 0}
+EOF
+  echo "Environment ${env} on ${repo}"
+}
+
+create_production_environment() {
+  local repo=$1
+  local env=$2
+  gh api "repos/${GITHUB_ORG}/${repo}/environments/${env}" -X PUT --input - <<EOF
+{
+  "wait_timer": 0,
+  "reviewers": [{"type": "User", "id": $(gh api user --jq .id)}]
+}
+EOF
+  echo "Environment ${env} on ${repo} (with reviewer)"
+}
+
+protect_branch() {
+  local repo=$1
+  shift
+  local checks_json=$1
+  gh api "repos/${GITHUB_ORG}/${repo}/branches/main/protection" -X PUT --input - <<EOF
 {
   "required_status_checks": {
     "strict": true,
-    "checks": [
-      {"context": "CI / backend-test"},
-      {"context": "CI / frontend-check"},
-      {"context": "Conventional Commits / commitlint"}
-    ]
+    "checks": ${checks_json}
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
@@ -30,30 +44,26 @@ protect_app_repo() {
   "restrictions": null
 }
 EOF
-  echo "Protected ${APP_REPO}/main"
+  echo "Protected ${repo}/main"
 }
 
-protect_infra_repo() {
-  gh api "repos/${GITHUB_ORG}/${INFRA_REPO}/branches/main/protection" -X PUT \
-    --input - <<EOF
-{
-  "required_status_checks": {
-    "strict": true,
-    "checks": [
-      {"context": "Terraform Plan / plan"}
-    ]
-  },
-  "enforce_admins": true,
-  "required_pull_request_reviews": {
-    "required_approving_review_count": 1
-  },
-  "restrictions": null
-}
-EOF
-  echo "Protected ${INFRA_REPO}/main"
-}
+# Infra repo environments
+create_environment "${INFRA_REPO}" "dev"
+create_environment "${INFRA_REPO}" "dev-infra"
+create_production_environment "${INFRA_REPO}" "production"
+create_production_environment "${INFRA_REPO}" "production-infra"
 
-protect_app_repo
-protect_infra_repo
+# App repo environments (when using production deploy)
+create_environment "${APP_REPO}" "dev" 2>/dev/null || true
 
-echo "Done. Verify in GitHub Settings → Branches."
+if gh api "repos/${GITHUB_ORG}/${APP_REPO}/branches/main" >/dev/null 2>&1; then
+  protect_branch "${APP_REPO}" '[{"context":"CI / backend-test"},{"context":"CI / frontend-check"},{"context":"Conventional Commits / commitlint"}]'
+else
+  echo "Skip ${APP_REPO}/main — branch does not exist yet. Create main from dev first."
+fi
+
+if gh api "repos/${GITHUB_ORG}/${INFRA_REPO}/branches/main" >/dev/null 2>&1; then
+  protect_branch "${INFRA_REPO}" '[{"context":"Terraform Plan / plan"}]'
+fi
+
+echo "Done."

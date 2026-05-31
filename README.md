@@ -1,33 +1,45 @@
 # mhcet-infra
 
-Terraform and GitHub Actions workflows for deploying the [mhcet](https://github.com/Shreyas-Yadav/mhcet) application to GCP.
+Terraform and GitHub Actions for deploying [mhcet](https://github.com/Shreyas-Yadav/mhcet) to GCP.
+
+## Pipeline architecture
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `plan.yml` | PR to `dev`/`main` | Terraform plan (infra changes only) |
+| `deploy-app-dev.yml` | `repository_dispatch` from app repo | `gcloud run update` with SHA image tags |
+| `deploy-app-prod.yml` | `repository_dispatch` on prod merge | Cloud Run prod deploy (requires `production` approval) |
+| `deploy-infra-dev.yml` | Push to `dev` (terraform/**) | Plan + apply infra (`dev-infra` environment) |
+| `deploy-infra-prod.yml` | PR merge to `main` (terraform/**) | Plan + apply prod infra (`production-infra` approval) |
+
+**App deploys** update Cloud Run images only. **Infra deploys** run Terraform for Cloud SQL, LB, secrets, monitoring, etc. Terraform ignores container image tags after initial create.
 
 ## Layout
 
 ```
 terraform/
-  bootstrap/          # One-time GCP setup (state bucket, WIF, service accounts)
-  modules/            # Reusable modules
+  bootstrap/       # WIF, state bucket, least-privilege IAM
+  modules/         # artifact_registry, cloud_sql, cloud_run, load_balancer, secrets, monitoring
   environments/
-    dev/              # Dev stack
-    prod/             # Prod stack
-.github/workflows/    # plan, deploy-dev, deploy-prod
-docs/deployment.md    # Full runbook
+    dev/
+    prod/
+.github/workflows/
+docs/
+  deployment.md
+  github-app-setup.md
+scripts/
+  bootstrap-gcp.sh
+  migrate-local-db-to-cloudsql.sh
+  setup-branch-protection.sh
+  sync-github-vars.sh
 ```
 
 ## Quick start
 
-1. Copy `terraform/bootstrap/terraform.tfvars.example` to `terraform.tfvars` and fill in your GCP project ID.
-2. Run bootstrap (see [docs/deployment.md](docs/deployment.md)).
-3. Copy environment tfvars examples and configure domains.
-4. Configure GitHub repository variables and environments.
-5. Push to `dev` in the app repo to trigger the first dev deploy.
+See [docs/deployment.md](docs/deployment.md).
 
-## Branching
+## Security notes
 
-| Branch | Purpose |
-|--------|---------|
-| `dev` | Dev infrastructure changes; Terraform plan on PR |
-| `main` | Prod infrastructure; changes only via PR from `dev` |
-
-App deployments are triggered by `repository_dispatch` events from the `mhcet` app repo.
+- GCP auth via Workload Identity Federation (no JSON keys)
+- Infra deploy SA uses scoped roles (not `roles/editor`)
+- Cross-repo dispatch: prefer GitHub App ([docs/github-app-setup.md](docs/github-app-setup.md)) over PAT

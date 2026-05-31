@@ -26,6 +26,7 @@ locals {
     "servicenetworking.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "sts.googleapis.com",
+    "monitoring.googleapis.com",
   ]
 }
 
@@ -89,6 +90,28 @@ resource "google_project_iam_member" "infra_deploy_artifact_reader" {
   member  = "serviceAccount:${google_service_account.infra_deploy.email}"
 }
 
+locals {
+  infra_deploy_roles = [
+    "roles/cloudsql.admin",
+    "roles/compute.loadBalancerAdmin",
+    "roles/compute.networkAdmin",
+    "roles/compute.securityAdmin",
+    "roles/secretmanager.admin",
+    "roles/artifactregistry.admin",
+    "roles/iam.serviceAccountAdmin",
+    "roles/resourcemanager.projectIamAdmin",
+    "roles/monitoring.admin",
+  ]
+}
+
+resource "google_project_iam_member" "infra_deploy" {
+  for_each = toset(local.infra_deploy_roles)
+
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.infra_deploy.email}"
+}
+
 resource "google_storage_bucket_iam_member" "infra_deploy_state" {
   bucket = google_storage_bucket.tf_state.name
   role   = "roles/storage.objectAdmin"
@@ -128,11 +151,4 @@ resource "google_service_account_iam_member" "infra_deploy_wif" {
   service_account_id = google_service_account.infra_deploy.name
   role               = "roles/iam.workloadIdentityUser"
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.infra_repo}"
-}
-
-# Infra deploy SA needs additional roles applied via environment stacks
-resource "google_project_iam_member" "infra_deploy_editor" {
-  project = var.project_id
-  role    = "roles/editor"
-  member  = "serviceAccount:${google_service_account.infra_deploy.email}"
 }

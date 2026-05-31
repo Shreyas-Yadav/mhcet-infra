@@ -77,3 +77,12 @@ module "load_balancer" {
 
   depends_on = [module.cloud_run]
 }
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  project_id         = var.project_id
+  environment        = var.environment
+  backend_health_url = var.backend_health_url
+  alert_email        = var.alert_email
+}

@@ -56,3 +56,12 @@ variable "backend_image" {
 variable "frontend_image" {
   type = string
 }
+
+variable "backend_health_url" {
+  type = string
+}
+
+variable "alert_email" {
+  type    = string
+  default = ""
+}
