@@ -8,6 +8,10 @@ APP_REPO="${APP_REPO:-mhcet}"
 INFRA_REPO="${INFRA_REPO:-mhcet-infra}"
 
 protect_app_repo() {
+  if ! gh api "repos/${GITHUB_ORG}/${APP_REPO}/branches/main" >/dev/null 2>&1; then
+    echo "Skip ${APP_REPO}/main — branch does not exist yet."
+    return 0
+  fi
   gh api "repos/${GITHUB_ORG}/${APP_REPO}/branches/main/protection" -X PUT \
     --input - <<EOF
 {
