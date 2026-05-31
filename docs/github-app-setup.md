@@ -8,7 +8,10 @@ Replace the personal access token (`INFRA_REPO_DISPATCH_TOKEN`) with a GitHub Ap
 2. Name: `mhcet-deploy-bot`
 3. Homepage: your repo URL
 4. Uncheck **Webhook** → **Active**
-5. Permissions → **Repository** → **Actions**: Read and write
+5. Permissions → **Repository**:
+   - **Actions**: Read and write
+   - **Contents**: Read and write (required for `repository_dispatch`)
+   - **Metadata**: Read-only (default)
 6. **Where can this app be installed?** → Only on this account
 7. Create app → **Generate a private key** (download `.pem`)
 
@@ -34,4 +37,10 @@ Push to `dev` in `mhcet`. The build workflow should dispatch `deploy-app-dev` wi
 
 ## Permissions summary
 
-The app only needs **Actions: Read and write** on `mhcet-infra` — enough for `repository_dispatch`, nothing else.
+| Permission | Access | Why |
+|------------|--------|-----|
+| Contents | Read and write | Required to call `POST /repos/.../dispatches` |
+| Actions | Read and write | Required for the triggered workflow to run |
+| Metadata | Read-only | Default; required for API access |
+
+After changing app permissions, open **Install App** → your account → **Configure** → review and **Accept new permissions** if prompted.
