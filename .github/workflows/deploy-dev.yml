@@ -1,0 +1,66 @@
+name: Deploy Dev
+
+on:
+  repository_dispatch:
+    types: [deploy-dev]
+  workflow_dispatch:
+    inputs:
+      backend_image:
+        description: Full backend image URI
+        required: true
+      frontend_image:
+        description: Full frontend image URI
+        required: true
+      source_sha:
+        description: App repo commit SHA
+        required: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_IN_AUTOMATION: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tags
+        id: images
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "backend=${{ github.event.client_payload.backend_image }}" >> "$GITHUB_OUTPUT"
+            echo "frontend=${{ github.event.client_payload.frontend_image }}" >> "$GITHUB_OUTPUT"
+            echo "source_sha=${{ github.event.client_payload.source_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend=${{ inputs.backend_image }}" >> "$GITHUB_OUTPUT"
+            echo "frontend=${{ inputs.frontend_image }}" >> "$GITHUB_OUTPUT"
+            echo "source_sha=${{ inputs.source_sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_INFRA_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/dev
+        run: |
+          terraform init -input=false
+          terraform apply -input=false -auto-approve \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="backend_image=${{ steps.images.outputs.backend }}" \
+            -var="frontend_image=${{ steps.images.outputs.frontend }}"
+
+      - name: Smoke test
+        run: |
+          curl --fail --retry 5 --retry-delay 10 "${{ vars.API_HEALTH_URL_DEV }}"

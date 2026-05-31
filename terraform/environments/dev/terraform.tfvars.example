@@ -1,0 +1,13 @@
+project_id             = "mhcet-app"
+region                 = "asia-south1"
+environment            = "dev"
+frontend_domain        = "dev.example.com"
+backend_domain         = "api-dev.example.com"
+cors_allowed_origins   = "https://dev.example.com"
+db_tier                = "db-f1-micro"
+backend_min_instances  = 0
+frontend_min_instances = 0
+
+# Replace with real images after first CI build, or set via -var in deploy workflow
+backend_image  = "us-docker.pkg.dev/cloudrun/container/hello"
+frontend_image = "us-docker.pkg.dev/cloudrun/container/hello"

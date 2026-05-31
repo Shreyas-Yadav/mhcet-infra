@@ -1,0 +1,6 @@
+project_id        = "mhcet-app"
+region            = "asia-south1"
+state_bucket_name = "mhcet-tf-state"
+github_org        = "Shreyas-Yadav"
+app_repo          = "mhcet"
+infra_repo        = "mhcet-infra"

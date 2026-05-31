@@ -1,0 +1,14 @@
+project_id             = "mhcet-app"
+region                 = "asia-south1"
+environment            = "prod"
+frontend_domain        = "example.com"
+backend_domain         = "api.example.com"
+cors_allowed_origins   = "https://example.com"
+db_tier                = "db-custom-1-3840"
+backend_min_instances  = 1
+frontend_min_instances = 0
+backend_max_instances  = 5
+frontend_max_instances = 5
+
+backend_image  = "us-docker.pkg.dev/cloudrun/container/hello"
+frontend_image = "us-docker.pkg.dev/cloudrun/container/hello"
