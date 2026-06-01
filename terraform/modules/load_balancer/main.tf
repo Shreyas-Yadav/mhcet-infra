@@ -39,15 +39,23 @@ resource "google_compute_security_policy" "backend" {
   }
 }
 
+locals {
+  cert_suffix = substr(sha256("${var.frontend_domain}:${var.backend_domain}"), 0, 8)
+}
+
 resource "google_compute_global_address" "lb_ip" {
   name = "${var.environment}-mhcet-lb-ip"
 }
 
 resource "google_compute_managed_ssl_certificate" "main" {
-  name = "${var.environment}-mhcet-cert"
+  name = "${var.environment}-mhcet-cert-${local.cert_suffix}"
 
   managed {
     domains = [var.frontend_domain, var.backend_domain]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

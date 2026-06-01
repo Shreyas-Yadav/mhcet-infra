@@ -22,6 +22,10 @@ resource "google_monitoring_uptime_check_config" "backend" {
       host       = local.health_host
     }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_monitoring_notification_channel" "email" {
