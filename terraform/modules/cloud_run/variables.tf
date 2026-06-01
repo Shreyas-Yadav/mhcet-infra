@@ -57,9 +57,3 @@ variable "frontend_max_instances" {
   type    = number
   default = 3
 }
-
-variable "rate_limit_requests_per_minute" {
-  description = "In-app API rate limit per client IP (also enforced at LB when using custom domain)"
-  type        = number
-  default     = 100
-}

@@ -61,16 +61,6 @@ resource "google_cloud_run_v2_service" "backend" {
         value = "false"
       }
 
-      env {
-        name  = "RATE_LIMIT_ENABLED"
-        value = "true"
-      }
-
-      env {
-        name  = "RATE_LIMIT_REQUESTS_PER_MINUTE"
-        value = tostring(var.rate_limit_requests_per_minute)
-      }
-
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"

@@ -42,4 +42,5 @@ See [docs/deployment.md](docs/deployment.md).
 
 - GCP auth via Workload Identity Federation (no JSON keys)
 - Infra deploy SA uses scoped roles (not `roles/editor`)
+- API rate limiting via Cloud Armor on the load balancer (not in the Spring Boot app)
 - Cross-repo dispatch: prefer GitHub App ([docs/github-app-setup.md](docs/github-app-setup.md)) over PAT

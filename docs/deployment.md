@@ -14,6 +14,7 @@ This document covers one-time setup and ongoing operations for the two-repo depl
 - **Cloud SQL PostgreSQL 16** — one instance per environment
 - **Secret Manager** — database passwords
 - **HTTPS Load Balancer** — custom domain + managed SSL certs
+- **Cloud Armor** — API rate limiting at the load balancer (default 100 req/min/IP; tune in `terraform/modules/load_balancer`)
 - **Workload Identity Federation** — GitHub Actions → GCP (no JSON keys)
 
 ## 1. GCP project setup
