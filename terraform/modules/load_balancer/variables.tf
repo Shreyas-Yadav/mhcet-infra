@@ -21,3 +21,9 @@ variable "frontend_service_name" {
 variable "backend_service_name" {
   type = string
 }
+
+variable "rate_limit_requests_per_minute" {
+  description = "Cloud Armor rate limit per client IP on the API backend service"
+  type        = number
+  default     = 100
+}

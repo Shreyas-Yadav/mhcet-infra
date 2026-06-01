@@ -1,3 +1,44 @@
+resource "google_compute_security_policy" "backend" {
+  name = "${var.environment}-mhcet-backend-armor"
+
+  rule {
+    action      = "throttle"
+    priority    = 1000
+    description = "Rate limit API traffic by client IP"
+
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]
+      }
+    }
+
+    rate_limit_options {
+      conform_action = "allow"
+      exceed_action  = "deny(429)"
+      enforce_on_key = "IP"
+
+      rate_limit_threshold {
+        count        = var.rate_limit_requests_per_minute
+        interval_sec = 60
+      }
+    }
+  }
+
+  rule {
+    action      = "allow"
+    priority    = 2147483647
+    description = "Default allow"
+
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]
+      }
+    }
+  }
+}
+
 resource "google_compute_global_address" "lb_ip" {
   name = "${var.environment}-mhcet-lb-ip"
 }
@@ -48,6 +89,7 @@ resource "google_compute_backend_service" "backend" {
   port_name             = "http"
   timeout_sec           = 30
   load_balancing_scheme = "EXTERNAL_MANAGED"
+  security_policy       = google_compute_security_policy.backend.id
 
   backend {
     group = google_compute_region_network_endpoint_group.backend.id
