@@ -6,7 +6,7 @@ resource "google_service_account" "cloud_run" {
 resource "google_cloud_run_v2_service" "backend" {
   name     = "${var.environment}-mhcet-backend"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   template {
     service_account = google_service_account.cloud_run.email
@@ -106,7 +106,7 @@ resource "google_cloud_run_v2_service" "backend" {
 resource "google_cloud_run_v2_service" "frontend" {
   name     = "${var.environment}-mhcet-frontend"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   template {
     service_account = google_service_account.cloud_run.email
