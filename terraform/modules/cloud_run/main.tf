@@ -69,7 +69,7 @@ resource "google_cloud_run_v2_service" "backend" {
       resources {
         limits = {
           cpu    = "1"
-          memory = "512Mi"
+          memory = var.backend_memory
         }
       }
 
@@ -127,7 +127,7 @@ resource "google_cloud_run_v2_service" "frontend" {
       resources {
         limits = {
           cpu    = "1"
-          memory = "512Mi"
+          memory = var.frontend_memory
         }
       }
     }

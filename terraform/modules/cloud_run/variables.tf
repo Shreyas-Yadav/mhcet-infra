@@ -57,3 +57,14 @@ variable "frontend_max_instances" {
   type    = number
   default = 3
 }
+
+/** Backend loads the full prediction index in memory at startup; 512Mi OOMs on prod data. */
+variable "backend_memory" {
+  type    = string
+  default = "2Gi"
+}
+
+variable "frontend_memory" {
+  type    = string
+  default = "512Mi"
+}
