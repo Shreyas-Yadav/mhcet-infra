@@ -9,6 +9,8 @@ resource "google_cloud_run_v2_job" "stress_test" {
   location = var.region
   project  = var.project_id
 
+  deletion_protection = false
+
   template {
     task_count  = var.task_count
     parallelism = var.parallelism
