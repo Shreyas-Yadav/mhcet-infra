@@ -27,7 +27,7 @@ jobs:
       - name: Execute stress test job
         id: exec
         run: |
-          EXEC=$(gcloud run jobs execute dev-mhcet-stress-test \
+          EXEC=$(gcloud run jobs execute dev-mhcet-load-test \
             --project="${{ vars.GCP_PROJECT_ID }}" \
             --region="${{ vars.GCP_REGION }}" \
             --format='value(name)')
@@ -46,7 +46,7 @@ jobs:
         if: inputs.wait
         run: |
           gcloud logging read \
-            'resource.type="cloud_run_job" AND resource.labels.job_name="dev-mhcet-stress-test"' \
+            'resource.type="cloud_run_job" AND resource.labels.job_name="dev-mhcet-load-test"' \
             --project="${{ vars.GCP_PROJECT_ID }}" \
             --limit=200 \
             --format='value(textPayload)' \

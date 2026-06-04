@@ -5,7 +5,7 @@ resource "google_service_account" "stress_test" {
 }
 
 resource "google_cloud_run_v2_job" "stress_test" {
-  name     = "${var.environment}-mhcet-stress-test"
+  name     = "${var.environment}-mhcet-load-test"
   location = var.region
   project  = var.project_id
 

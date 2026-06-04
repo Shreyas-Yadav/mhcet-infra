@@ -32,6 +32,14 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      - name: Allow replacing orphaned stress-test job
+        continue-on-error: true
+        run: |
+          gcloud run jobs update dev-mhcet-stress-test \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --no-deletion-protection
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8

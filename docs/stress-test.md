@@ -5,7 +5,7 @@ Distributed stress test for the dev API: **17 parallel tasks × 300 requests ≈
 ## Architecture
 
 ```text
-Terraform (dev) → Cloud Run Job `dev-mhcet-stress-test`
+Terraform (dev) → Cloud Run Job `dev-mhcet-load-test`
                  → 17 tasks in parallel (each runs stress.sh)
                  → HTTPS → Load Balancer → Cloud Armor → dev backend
 ```
@@ -60,7 +60,7 @@ The job references `…/stress-test:dev-latest`. Run the build workflow **once**
 ### Option B — gcloud
 
 ```bash
-gcloud run jobs execute dev-mhcet-stress-test \
+gcloud run jobs execute dev-mhcet-load-test \
   --project=mhcet-app \
   --region=asia-south1
 ```
@@ -79,7 +79,7 @@ Cloud Console → **Logging** → filter:
 
 ```text
 resource.type="cloud_run_job"
-resource.labels.job_name="dev-mhcet-stress-test"
+resource.labels.job_name="dev-mhcet-load-test"
 ```
 
 Each task logs status code counts and `summary: ok=… limited=… unavailable=…`.

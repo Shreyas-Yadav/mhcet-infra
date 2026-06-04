@@ -11,7 +11,7 @@ Terraform and GitHub Actions for deploying [mhcet](https://github.com/Shreyas-Ya
 | `deploy-app-prod.yml` | `repository_dispatch` on prod merge | Cloud Run prod deploy (requires `production` approval) |
 | `deploy-infra-dev.yml` | Push to `dev` (terraform/**) | Plan + apply infra (`dev-infra` environment) |
 | `build-stress-test-dev.yml` | Push to `dev` (stress-test/**) or manual | Build `stress-test` Docker image to Artifact Registry |
-| `execute-stress-test-dev.yml` | Manual | Run `dev-mhcet-stress-test` Cloud Run Job |
+| `execute-stress-test-dev.yml` | Manual | Run `dev-mhcet-load-test` Cloud Run Job |
 | `deploy-infra-prod.yml` | PR merge to `main` (terraform/**) | Plan + apply prod infra (`production-infra` approval) |
 
 **App deploys** update Cloud Run images only. **Infra deploys** run Terraform for Cloud SQL, LB, secrets, monitoring, etc. Terraform ignores container image tags after initial create.
