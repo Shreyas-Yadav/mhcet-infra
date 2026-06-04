@@ -41,5 +41,5 @@ jobs:
           context: ./stress-test
           push: true
           tags: |
-            ${{ vars.ARTIFACT_REGISTRY }}/stress-test:dev-${{ github.sha }}
-            ${{ vars.ARTIFACT_REGISTRY }}/stress-test:dev-latest
+            ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/mhcet/stress-test:dev-${{ github.sha }}
+            ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/mhcet/stress-test:dev-latest
