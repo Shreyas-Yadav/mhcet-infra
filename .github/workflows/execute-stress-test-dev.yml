@@ -15,7 +15,6 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    environment: dev-infra
     steps:
       - uses: google-github-actions/auth@v2
         with:
