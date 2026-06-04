@@ -1,0 +1,53 @@
+name: Execute Stress Test Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      wait:
+        description: Wait for job completion and print recent logs
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: dev-infra
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_INFRA_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Execute stress test job
+        id: exec
+        run: |
+          EXEC=$(gcloud run jobs execute dev-mhcet-stress-test \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --format='value(name)')
+          echo "execution=$EXEC" >> "$GITHUB_OUTPUT"
+          echo "Started execution: $EXEC"
+
+      - name: Wait for completion
+        if: inputs.wait
+        run: |
+          gcloud run jobs executions describe "${{ steps.exec.outputs.execution }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --format='yaml(status)'
+
+      - name: Task logs
+        if: inputs.wait
+        run: |
+          gcloud logging read \
+            'resource.type="cloud_run_job" AND resource.labels.job_name="dev-mhcet-stress-test"' \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --limit=200 \
+            --format='value(textPayload)' \
+            --freshness=45m

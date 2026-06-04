@@ -49,7 +49,9 @@ jobs:
             -var="backend_health_url=${{ vars.API_HEALTH_URL_DEV }}" \
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
             -var="backend_image=${{ vars.CURRENT_BACKEND_IMAGE_DEV }}" \
-            -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}"
+            -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}" \
+            -var="stress_test_enabled=${{ vars.STRESS_TEST_ENABLED == 'true' }}" \
+            -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}"
 
       - name: Terraform Apply
         working-directory: terraform/environments/dev

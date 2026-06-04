@@ -13,3 +13,8 @@ backend_image  = "us-docker.pkg.dev/cloudrun/container/hello"
 frontend_image = "us-docker.pkg.dev/cloudrun/container/hello"
 backend_health_url = "https://dev-mhcet-backend-f6dsxixcpq-el.a.run.app/health"
 alert_email    = ""
+
+# --- Optional dev load test (see docs/stress-test.md) ---
+# stress_test_enabled             = true
+# rate_limit_requests_per_minute  = 5000   # raise during test; revert to 100 after
+# stress_test_runner_members      = ["user:you@example.com"]

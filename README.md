@@ -10,6 +10,8 @@ Terraform and GitHub Actions for deploying [mhcet](https://github.com/Shreyas-Ya
 | `deploy-app-dev.yml` | `repository_dispatch` from app repo | `gcloud run update` with SHA image tags |
 | `deploy-app-prod.yml` | `repository_dispatch` on prod merge | Cloud Run prod deploy (requires `production` approval) |
 | `deploy-infra-dev.yml` | Push to `dev` (terraform/**) | Plan + apply infra (`dev-infra` environment) |
+| `build-stress-test-dev.yml` | Push to `dev` (stress-test/**) or manual | Build `stress-test` Docker image to Artifact Registry |
+| `execute-stress-test-dev.yml` | Manual | Run `dev-mhcet-stress-test` Cloud Run Job |
 | `deploy-infra-prod.yml` | PR merge to `main` (terraform/**) | Plan + apply prod infra (`production-infra` approval) |
 
 **App deploys** update Cloud Run images only. **Infra deploys** run Terraform for Cloud SQL, LB, secrets, monitoring, etc. Terraform ignores container image tags after initial create.
@@ -19,7 +21,7 @@ Terraform and GitHub Actions for deploying [mhcet](https://github.com/Shreyas-Ya
 ```
 terraform/
   bootstrap/       # WIF, state bucket, least-privilege IAM
-  modules/         # artifact_registry, cloud_sql, cloud_run, load_balancer, secrets, monitoring
+  modules/         # artifact_registry, cloud_sql, cloud_run, load_balancer, secrets, monitoring, stress_test
   environments/
     dev/
     prod/
@@ -36,7 +38,7 @@ scripts/
 
 ## Quick start
 
-See [docs/deployment.md](docs/deployment.md).
+See [docs/deployment.md](docs/deployment.md). Dev load testing: [docs/stress-test.md](docs/stress-test.md).
 
 ## Security notes
 
