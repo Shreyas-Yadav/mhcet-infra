@@ -11,6 +11,9 @@ on:
       frontend_image:
         description: Full frontend image URI (SHA tag)
         required: true
+      ai_image:
+        description: Full AI service image URI (SHA tag)
+        required: false
       source_sha:
         description: App repo commit SHA
         required: false
@@ -30,10 +33,12 @@ jobs:
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
             echo "backend=${{ github.event.client_payload.backend_image }}" >> "$GITHUB_OUTPUT"
             echo "frontend=${{ github.event.client_payload.frontend_image }}" >> "$GITHUB_OUTPUT"
+            echo "ai=${{ github.event.client_payload.ai_image }}" >> "$GITHUB_OUTPUT"
             echo "source_sha=${{ github.event.client_payload.source_sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "backend=${{ inputs.backend_image }}" >> "$GITHUB_OUTPUT"
             echo "frontend=${{ inputs.frontend_image }}" >> "$GITHUB_OUTPUT"
+            echo "ai=${{ inputs.ai_image }}" >> "$GITHUB_OUTPUT"
             echo "source_sha=${{ inputs.source_sha }}" >> "$GITHUB_OUTPUT"
           fi
 
@@ -57,6 +62,14 @@ jobs:
             --project="${{ vars.GCP_PROJECT_ID }}" \
             --region="${{ vars.GCP_REGION }}" \
             --image="${{ steps.images.outputs.frontend }}"
+
+      - name: Deploy AI service to Cloud Run
+        if: steps.images.outputs.ai != ''
+        run: |
+          gcloud run services update prod-mhcet-ai \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --image="${{ steps.images.outputs.ai }}"
 
       - name: Smoke test health
         run: |

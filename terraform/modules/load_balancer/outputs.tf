@@ -14,5 +14,10 @@ output "dns_records" {
       name  = var.backend_domain
       value = google_compute_global_address.lb_ip.address
     }
+    ai = {
+      type  = "A"
+      name  = var.ai_domain
+      value = google_compute_global_address.lb_ip.address
+    }
   }
 }

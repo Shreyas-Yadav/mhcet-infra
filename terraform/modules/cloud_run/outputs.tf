@@ -17,3 +17,11 @@ output "frontend_uri" {
 output "cloud_run_service_account_email" {
   value = google_service_account.cloud_run.email
 }
+
+output "ai_service_name" {
+  value = google_cloud_run_v2_service.ai.name
+}
+
+output "ai_uri" {
+  value = google_cloud_run_v2_service.ai.uri
+}

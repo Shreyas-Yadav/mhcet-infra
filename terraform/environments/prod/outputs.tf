@@ -25,3 +25,11 @@ output "cloud_run_backend_uri" {
 output "cloud_run_frontend_uri" {
   value = module.cloud_run.frontend_uri
 }
+
+output "cloud_run_ai_uri" {
+  value = module.cloud_run.ai_uri
+}
+
+output "ai_url" {
+  value = "https://${var.ai_domain}"
+}

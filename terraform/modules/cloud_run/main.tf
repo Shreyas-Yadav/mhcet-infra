@@ -61,6 +61,11 @@ resource "google_cloud_run_v2_service" "backend" {
         value = "false"
       }
 
+      env {
+        name  = "AI_SERVICE_URL"
+        value = "https://${var.ai_domain}"
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
@@ -166,4 +171,96 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_db_password" {
   secret_id = var.db_password_secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.cloud_run.email}"
+}
+
+# AI service — separate service account (no DB access needed)
+resource "google_service_account" "ai_run" {
+  account_id   = "${var.environment}-ai-run"
+  display_name = "Cloud Run AI runtime - ${var.environment}"
+}
+
+resource "google_cloud_run_v2_service" "ai" {
+  name     = "${var.environment}-mhcet-ai"
+  location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+
+  template {
+    service_account = google_service_account.ai_run.email
+
+    scaling {
+      min_instance_count = var.ai_min_instances
+      max_instance_count = var.ai_max_instances
+    }
+
+    containers {
+      name  = "ai"
+      image = var.ai_image
+
+      ports {
+        container_port = 8081
+      }
+
+      env {
+        name = "GOOGLE_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = var.google_api_key_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "GOOGLE_GENAI_USE_VERTEXAI"
+        value = "FALSE"
+      }
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "1Gi"
+        }
+      }
+
+      startup_probe {
+        http_get {
+          path = "/health"
+          port = 8081
+        }
+        initial_delay_seconds = 10
+        timeout_seconds       = 3
+        period_seconds        = 10
+        failure_threshold     = 6
+      }
+
+      liveness_probe {
+        http_get {
+          path = "/health"
+          port = 8081
+        }
+        period_seconds = 30
+      }
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      client,
+      client_version,
+      template[0].containers[0].image,
+    ]
+  }
+}
+
+resource "google_cloud_run_v2_service_iam_member" "ai_public" {
+  name     = google_cloud_run_v2_service.ai.name
+  location = var.region
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+resource "google_secret_manager_secret_iam_member" "ai_run_google_api_key" {
+  secret_id = var.google_api_key_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.ai_run.email}"
 }

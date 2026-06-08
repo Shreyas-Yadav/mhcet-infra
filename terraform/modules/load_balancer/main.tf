@@ -40,7 +40,7 @@ resource "google_compute_security_policy" "backend" {
 }
 
 locals {
-  cert_suffix = substr(sha256("${var.frontend_domain}:${var.backend_domain}"), 0, 8)
+  cert_suffix = substr(sha256("${var.frontend_domain}:${var.backend_domain}:${var.ai_domain}"), 0, 8)
 }
 
 resource "google_compute_global_address" "lb_ip" {
@@ -51,7 +51,7 @@ resource "google_compute_managed_ssl_certificate" "main" {
   name = "${var.environment}-mhcet-cert-${local.cert_suffix}"
 
   managed {
-    domains = [var.frontend_domain, var.backend_domain]
+    domains = [var.frontend_domain, var.backend_domain, var.ai_domain]
   }
 
   lifecycle {
@@ -76,6 +76,16 @@ resource "google_compute_region_network_endpoint_group" "backend" {
 
   cloud_run {
     service = var.backend_service_name
+  }
+}
+
+resource "google_compute_region_network_endpoint_group" "ai" {
+  name                  = "${var.environment}-ai-neg"
+  network_endpoint_type = "SERVERLESS"
+  region                = var.region
+
+  cloud_run {
+    service = var.ai_service_name
   }
 }
 
@@ -104,6 +114,18 @@ resource "google_compute_backend_service" "backend" {
   }
 }
 
+resource "google_compute_backend_service" "ai" {
+  name                  = "${var.environment}-ai-backend"
+  protocol              = "HTTP"
+  port_name             = "http"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  security_policy       = google_compute_security_policy.backend.id
+
+  backend {
+    group = google_compute_region_network_endpoint_group.ai.id
+  }
+}
+
 resource "google_compute_url_map" "main" {
   name            = "${var.environment}-mhcet-url-map"
   default_service = google_compute_backend_service.frontend.id
@@ -118,6 +140,11 @@ resource "google_compute_url_map" "main" {
     path_matcher = "backend"
   }
 
+  host_rule {
+    hosts        = [var.ai_domain]
+    path_matcher = "ai"
+  }
+
   path_matcher {
     name            = "frontend"
     default_service = google_compute_backend_service.frontend.id
@@ -126,6 +153,11 @@ resource "google_compute_url_map" "main" {
   path_matcher {
     name            = "backend"
     default_service = google_compute_backend_service.backend.id
+  }
+
+  path_matcher {
+    name            = "ai"
+    default_service = google_compute_backend_service.ai.id
   }
 }
 

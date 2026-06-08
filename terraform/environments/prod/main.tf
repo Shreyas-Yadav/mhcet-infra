@@ -31,7 +31,8 @@ data "google_artifact_registry_repository" "mhcet" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  environment = var.environment
+  environment    = var.environment
+  google_api_key = var.google_api_key
 }
 
 module "cloud_sql" {
@@ -63,6 +64,9 @@ module "cloud_run" {
   frontend_min_instances    = var.frontend_min_instances
   backend_max_instances     = var.backend_max_instances
   frontend_max_instances    = var.frontend_max_instances
+  ai_image                  = var.ai_image
+  ai_domain                 = var.ai_domain
+  google_api_key_secret_id  = module.secrets.google_api_key_secret_id
 
   depends_on = [module.cloud_sql, module.secrets]
 }
@@ -76,6 +80,8 @@ module "load_balancer" {
   backend_domain        = var.backend_domain
   frontend_service_name = module.cloud_run.frontend_service_name
   backend_service_name  = module.cloud_run.backend_service_name
+  ai_service_name       = module.cloud_run.ai_service_name
+  ai_domain             = var.ai_domain
 
   depends_on = [module.cloud_run]
 }

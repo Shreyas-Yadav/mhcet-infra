@@ -105,3 +105,17 @@ variable "stress_test_runner_members" {
   type        = list(string)
   default     = []
 }
+
+variable "ai_image" {
+  type = string
+}
+
+variable "ai_domain" {
+  type = string
+}
+
+variable "google_api_key" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

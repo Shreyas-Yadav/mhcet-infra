@@ -58,7 +58,7 @@ variable "frontend_max_instances" {
   default = 3
 }
 
-/** Backend loads the full prediction index in memory at startup; 512Mi OOMs on prod data. */
+# Backend loads the full prediction index in memory at startup; 512Mi OOMs on prod data.
 variable "backend_memory" {
   type    = string
   default = "2Gi"
@@ -67,4 +67,26 @@ variable "backend_memory" {
 variable "frontend_memory" {
   type    = string
   default = "512Mi"
+}
+
+variable "ai_image" {
+  type = string
+}
+
+variable "ai_domain" {
+  type = string
+}
+
+variable "google_api_key_secret_id" {
+  type = string
+}
+
+variable "ai_min_instances" {
+  type    = number
+  default = 0
+}
+
+variable "ai_max_instances" {
+  type    = number
+  default = 2
 }

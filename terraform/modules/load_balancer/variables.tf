@@ -27,3 +27,11 @@ variable "rate_limit_requests_per_minute" {
   type        = number
   default     = 100
 }
+
+variable "ai_domain" {
+  type = string
+}
+
+variable "ai_service_name" {
+  type = string
+}

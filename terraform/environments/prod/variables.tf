@@ -65,3 +65,17 @@ variable "alert_email" {
   type    = string
   default = ""
 }
+
+variable "ai_image" {
+  type = string
+}
+
+variable "ai_domain" {
+  type = string
+}
+
+variable "google_api_key" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
