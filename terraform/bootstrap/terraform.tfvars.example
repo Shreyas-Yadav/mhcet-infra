@@ -3,6 +3,7 @@ region             = "asia-south1"
 state_bucket_name  = "mhcet-tf-state"
 github_org         = "Shreyas-Yadav"
 app_repo           = "mhcet"
+ai_repo            = "mhcet-ai-service"
 infra_repo         = "mhcet-infra"
 billing_account_id = "0174B5-A8EC0A-69EEE4"
 monthly_budget_usd = 25

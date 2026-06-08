@@ -148,6 +148,12 @@ resource "google_service_account_iam_member" "app_build_wif" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.app_repo}"
 }
 
+resource "google_service_account_iam_member" "ai_build_wif" {
+  service_account_id = google_service_account.app_build.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.ai_repo}"
+}
+
 resource "google_service_account_iam_member" "infra_deploy_wif" {
   service_account_id = google_service_account.infra_deploy.name
   role               = "roles/iam.workloadIdentityUser"

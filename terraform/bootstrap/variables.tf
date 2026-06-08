@@ -26,6 +26,12 @@ variable "app_repo" {
   default     = "mhcet"
 }
 
+variable "ai_repo" {
+  description = "AI service repository name"
+  type        = string
+  default     = "mhcet-ai-service"
+}
+
 variable "infra_repo" {
   description = "Infrastructure repository name"
   type        = string
