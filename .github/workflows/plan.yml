@@ -54,11 +54,13 @@ jobs:
             echo "backend_domain=${{ vars.BACKEND_DOMAIN_PROD }}" >> "$GITHUB_OUTPUT"
             echo "cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_PROD }}" >> "$GITHUB_OUTPUT"
             echo "backend_health_url=${{ vars.API_HEALTH_URL_PROD }}" >> "$GITHUB_OUTPUT"
+            echo "ai_domain=${{ vars.AI_DOMAIN_PROD }}" >> "$GITHUB_OUTPUT"
           else
             echo "frontend_domain=${{ vars.FRONTEND_DOMAIN_DEV }}" >> "$GITHUB_OUTPUT"
             echo "backend_domain=${{ vars.BACKEND_DOMAIN_DEV }}" >> "$GITHUB_OUTPUT"
             echo "cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_DEV }}" >> "$GITHUB_OUTPUT"
             echo "backend_health_url=${{ vars.API_HEALTH_URL_DEV }}" >> "$GITHUB_OUTPUT"
+            echo "ai_domain=${{ vars.AI_DOMAIN_DEV }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Terraform Plan
@@ -75,6 +77,8 @@ jobs:
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
             -var="backend_image=${{ vars.PLAN_BACKEND_IMAGE }}" \
             -var="frontend_image=${{ vars.PLAN_FRONTEND_IMAGE }}" \
+            -var="ai_image=${{ vars.PLAN_AI_IMAGE }}" \
+            -var="ai_domain=${{ steps.tfvars.outputs.ai_domain }}" \
             -out=tfplan 2>&1 | tee plan.txt
         continue-on-error: true
 

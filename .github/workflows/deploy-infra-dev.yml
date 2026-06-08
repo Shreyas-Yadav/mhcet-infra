@@ -57,6 +57,8 @@ jobs:
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
             -var="backend_image=${{ vars.CURRENT_BACKEND_IMAGE_DEV }}" \
             -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}" \
+            -var="ai_image=${{ vars.CURRENT_AI_IMAGE_DEV }}" \
+            -var="ai_domain=${{ vars.AI_DOMAIN_DEV }}" \
             -var="stress_test_enabled=${{ vars.STRESS_TEST_ENABLED == 'true' }}" \
             -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}"
 

@@ -50,6 +50,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy backend to Cloud Run
+        if: steps.images.outputs.backend != ''
         run: |
           gcloud run services update prod-mhcet-backend \
             --project="${{ vars.GCP_PROJECT_ID }}" \
@@ -57,6 +58,7 @@ jobs:
             --image="${{ steps.images.outputs.backend }}"
 
       - name: Deploy frontend to Cloud Run
+        if: steps.images.outputs.frontend != ''
         run: |
           gcloud run services update prod-mhcet-frontend \
             --project="${{ vars.GCP_PROJECT_ID }}" \

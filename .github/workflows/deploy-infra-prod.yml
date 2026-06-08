@@ -50,7 +50,9 @@ jobs:
             -var="backend_health_url=${{ vars.API_HEALTH_URL_PROD }}" \
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
             -var="backend_image=${{ vars.CURRENT_BACKEND_IMAGE_PROD }}" \
-            -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_PROD }}"
+            -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_PROD }}" \
+            -var="ai_image=${{ vars.CURRENT_AI_IMAGE_PROD }}" \
+            -var="ai_domain=${{ vars.AI_DOMAIN_PROD }}"
 
       - name: Terraform Apply
         working-directory: terraform/environments/prod
