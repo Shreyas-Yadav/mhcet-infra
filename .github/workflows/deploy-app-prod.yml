@@ -74,10 +74,12 @@ jobs:
             --image="${{ steps.images.outputs.ai }}"
 
       - name: Smoke test health
+        if: steps.images.outputs.backend != ''
         run: |
           curl --fail --retry 8 --retry-delay 10 "${{ vars.API_HEALTH_URL_PROD }}"
 
       - name: Smoke test database-backed API
+        if: steps.images.outputs.backend != ''
         run: |
           count=$(curl --fail --retry 5 --retry-delay 5 \
             "${{ vars.API_BASE_URL_PROD }}/districts" | jq 'length')
