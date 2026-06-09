@@ -25,15 +25,3 @@ output "cloud_run_backend_uri" {
 output "cloud_run_frontend_uri" {
   value = module.cloud_run.frontend_uri
 }
-
-output "stress_test_job_name" {
-  value = var.stress_test_enabled ? module.stress_test[0].job_name : null
-}
-
-output "stress_test_total_requests" {
-  value = var.stress_test_enabled ? module.stress_test[0].total_requests : null
-}
-
-output "stress_test_execute_command" {
-  value = var.stress_test_enabled ? module.stress_test[0].execute_command : null
-}

@@ -84,24 +84,6 @@ module "load_balancer" {
   depends_on = [module.cloud_run]
 }
 
-module "stress_test" {
-  count  = var.stress_test_enabled ? 1 : 0
-  source = "../../modules/stress_test"
-
-  project_id        = var.project_id
-  environment       = var.environment
-  region            = var.region
-  image             = "${module.artifact_registry.repository_url}/stress-test:${var.stress_test_image_tag}"
-  api_url           = "https://${var.backend_domain}${var.stress_test_api_path}"
-  task_count        = var.stress_test_task_count
-  parallelism       = var.stress_test_parallelism
-  requests_per_task = var.stress_test_requests_per_task
-  concurrency       = var.stress_test_concurrency
-  runner_members    = var.stress_test_runner_members
-
-  depends_on = [module.artifact_registry]
-}
-
 module "monitoring" {
   source = "../../modules/monitoring"
 

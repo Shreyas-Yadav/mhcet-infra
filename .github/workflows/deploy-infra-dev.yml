@@ -36,15 +36,6 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      - name: Import existing stress job into state if missing
-        continue-on-error: true
-        working-directory: terraform/environments/dev
-        run: |
-          terraform init -input=false
-          terraform state show 'module.stress_test[0].google_cloud_run_v2_job.stress_test' 2>/dev/null || \
-            terraform import 'module.stress_test[0].google_cloud_run_v2_job.stress_test' \
-              'projects/${{ vars.GCP_PROJECT_ID }}/locations/${{ vars.GCP_REGION }}/jobs/dev-mhcet-load-test'
-
       - name: Terraform Plan
         working-directory: terraform/environments/dev
         run: |
@@ -62,7 +53,6 @@ jobs:
             -var="cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_DEV }}" \
             -var="backend_health_url=${{ vars.API_HEALTH_URL_DEV }}" \
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
-            -var="stress_test_enabled=${{ vars.STRESS_TEST_ENABLED == 'true' }}" \
             -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}" \
             $EXTRA_VARS
 

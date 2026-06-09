@@ -62,50 +62,6 @@ variable "rate_limit_requests_per_minute" {
   default     = 100
 }
 
-variable "stress_test_enabled" {
-  description = "Provision Cloud Run Job for distributed load tests (dev only)."
-  type        = bool
-  default     = false
-}
-
-variable "stress_test_image_tag" {
-  type    = string
-  default = "dev-latest"
-}
-
-variable "stress_test_task_count" {
-  description = "Parallel job tasks; total requests = task_count × requests_per_task (default 17×300 ≈ 5100)."
-  type        = number
-  default     = 17
-}
-
-variable "stress_test_parallelism" {
-  type    = number
-  default = 17
-}
-
-variable "stress_test_requests_per_task" {
-  type    = number
-  default = 300
-}
-
-variable "stress_test_concurrency" {
-  type    = number
-  default = 25
-}
-
-variable "stress_test_api_path" {
-  description = "Path + query for predict load test (host comes from backend_domain)."
-  type        = string
-  default     = "/predictions?percentile=90&category=OPEN&gender=MALE&page=0&size=25&includeMapOptions=false"
-}
-
-variable "stress_test_runner_members" {
-  description = "IAM members who may execute the stress job (roles/run.jobsExecutor)."
-  type        = list(string)
-  default     = []
-}
-
 variable "ai_image" {
   type = string
 }
