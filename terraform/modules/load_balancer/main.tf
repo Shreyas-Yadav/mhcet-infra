@@ -40,18 +40,31 @@ resource "google_compute_security_policy" "backend" {
 }
 
 locals {
-  cert_suffix = substr(sha256("${var.frontend_domain}:${var.backend_domain}:${var.ai_domain}"), 0, 8)
+  app_cert_suffix = substr(sha256("${var.frontend_domain}:${var.backend_domain}"), 0, 8)
+  ai_cert_suffix  = substr(sha256(var.ai_domain), 0, 8)
 }
 
 resource "google_compute_global_address" "lb_ip" {
   name = "${var.environment}-mhcet-lb-ip"
 }
 
-resource "google_compute_managed_ssl_certificate" "main" {
-  name = "${var.environment}-mhcet-cert-${local.cert_suffix}"
+resource "google_compute_managed_ssl_certificate" "app" {
+  name = "${var.environment}-mhcet-cert-${local.app_cert_suffix}"
 
   managed {
-    domains = [var.frontend_domain, var.backend_domain, var.ai_domain]
+    domains = [var.frontend_domain, var.backend_domain]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_managed_ssl_certificate" "ai" {
+  name = "${var.environment}-mhcet-ai-cert-${local.ai_cert_suffix}"
+
+  managed {
+    domains = [var.ai_domain]
   }
 
   lifecycle {
@@ -164,7 +177,10 @@ resource "google_compute_url_map" "main" {
 resource "google_compute_target_https_proxy" "main" {
   name             = "${var.environment}-mhcet-https-proxy"
   url_map          = google_compute_url_map.main.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.main.id]
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.app.id,
+    google_compute_managed_ssl_certificate.ai.id,
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "https" {
