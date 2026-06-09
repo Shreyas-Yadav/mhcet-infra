@@ -36,12 +36,14 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      - name: Drop orphaned stress job from state (one-time rename recovery)
+      - name: Import existing stress job into state if missing
         continue-on-error: true
         working-directory: terraform/environments/dev
         run: |
           terraform init -input=false
-          terraform state rm 'module.stress_test[0].google_cloud_run_v2_job.stress_test'
+          terraform state show 'module.stress_test[0].google_cloud_run_v2_job.stress_test' 2>/dev/null || \
+            terraform import 'module.stress_test[0].google_cloud_run_v2_job.stress_test' \
+              'projects/${{ vars.GCP_PROJECT_ID }}/locations/${{ vars.GCP_REGION }}/jobs/dev-mhcet-load-test'
 
       - name: Terraform Plan
         working-directory: terraform/environments/dev
