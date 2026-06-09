@@ -177,8 +177,10 @@ resource "google_compute_url_map" "main" {
 resource "google_compute_target_https_proxy" "main" {
   name             = "${var.environment}-mhcet-https-proxy"
   url_map          = google_compute_url_map.main.id
-  # App cert only — attach ai cert after ai-api-dev DNS is live and cert is ACTIVE
-  ssl_certificates = [google_compute_managed_ssl_certificate.app.id]
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.app.id,
+    google_compute_managed_ssl_certificate.ai.id,
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "https" {

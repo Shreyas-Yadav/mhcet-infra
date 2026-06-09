@@ -106,8 +106,14 @@ Create a fine-grained PAT with **Actions: Read and write** on `mhcet-infra` only
 | `API_HEALTH_URL_PROD` | `https://api.yourdomain.com/health` |
 | `PLAN_BACKEND_IMAGE` | `us-docker.pkg.dev/cloudrun/container/hello` |
 | `PLAN_FRONTEND_IMAGE` | `us-docker.pkg.dev/cloudrun/container/hello` |
+| `CURRENT_BACKEND_IMAGE_DEV` | Latest dev backend image URI (for infra-only deploys) |
+| `CURRENT_FRONTEND_IMAGE_DEV` | Latest dev frontend image URI |
+| `CURRENT_AI_IMAGE_DEV` | `asia-south1-docker.pkg.dev/mhcet-app-498018/mhcet/ai:dev-latest` |
+| `AI_DOMAIN_DEV` | `ai-api-dev.shri.software` |
 | `CURRENT_BACKEND_IMAGE_PROD` | Latest prod backend image URI (for infra-only deploys) |
 | `CURRENT_FRONTEND_IMAGE_PROD` | Latest prod frontend image URI |
+| `CURRENT_AI_IMAGE_PROD` | Latest prod AI image URI |
+| `AI_DOMAIN_PROD` | `ai-api.shri.software` |
 
 **GitHub Environments:**
 

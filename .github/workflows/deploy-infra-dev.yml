@@ -47,6 +47,11 @@ jobs:
         working-directory: terraform/environments/dev
         run: |
           terraform init -input=false
+          EXTRA_VARS=""
+          [ -n "${{ vars.CURRENT_BACKEND_IMAGE_DEV }}" ] && EXTRA_VARS="$EXTRA_VARS -var=backend_image=${{ vars.CURRENT_BACKEND_IMAGE_DEV }}"
+          [ -n "${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}" ] && EXTRA_VARS="$EXTRA_VARS -var=frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}"
+          [ -n "${{ vars.CURRENT_AI_IMAGE_DEV }}" ] && EXTRA_VARS="$EXTRA_VARS -var=ai_image=${{ vars.CURRENT_AI_IMAGE_DEV }}"
+          [ -n "${{ vars.AI_DOMAIN_DEV }}" ] && EXTRA_VARS="$EXTRA_VARS -var=ai_domain=${{ vars.AI_DOMAIN_DEV }}"
           terraform plan -input=false -no-color -out=tfplan \
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
             -var="region=${{ vars.GCP_REGION }}" \
@@ -55,12 +60,9 @@ jobs:
             -var="cors_allowed_origins=${{ vars.CORS_ALLOWED_ORIGINS_DEV }}" \
             -var="backend_health_url=${{ vars.API_HEALTH_URL_DEV }}" \
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
-            -var="backend_image=${{ vars.CURRENT_BACKEND_IMAGE_DEV }}" \
-            -var="frontend_image=${{ vars.CURRENT_FRONTEND_IMAGE_DEV }}" \
-            -var="ai_image=${{ vars.CURRENT_AI_IMAGE_DEV }}" \
-            -var="ai_domain=${{ vars.AI_DOMAIN_DEV }}" \
             -var="stress_test_enabled=${{ vars.STRESS_TEST_ENABLED == 'true' }}" \
-            -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}"
+            -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}" \
+            $EXTRA_VARS
 
       - name: Terraform Apply
         working-directory: terraform/environments/dev
