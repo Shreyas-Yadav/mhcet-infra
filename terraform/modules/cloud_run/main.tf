@@ -215,6 +215,14 @@ resource "google_cloud_run_v2_service" "ai" {
         value = "FALSE"
       }
 
+      # The AI service's function tools call the backend API (get_predictions,
+      # get_college_cutoffs, etc.). On Cloud Run it reaches the backend via the
+      # public LB domain; without this it falls back to localhost and tool calls fail.
+      env {
+        name  = "BACKEND_URL"
+        value = "https://${var.backend_domain}"
+      }
+
       resources {
         limits = {
           cpu    = "1"

@@ -77,6 +77,10 @@ variable "ai_domain" {
   type = string
 }
 
+variable "backend_domain" {
+  type = string
+}
+
 variable "google_api_key_secret_id" {
   type = string
 }

@@ -64,6 +64,7 @@ module "cloud_run" {
   frontend_min_instances    = var.frontend_min_instances
   ai_image                  = var.ai_image
   ai_domain                 = var.ai_domain
+  backend_domain            = var.backend_domain
   google_api_key_secret_id  = module.secrets.google_api_key_secret_id
 
   depends_on = [module.cloud_sql, module.secrets]
