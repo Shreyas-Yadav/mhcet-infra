@@ -81,7 +81,11 @@ jobs:
       - name: Smoke test database-backed API
         if: steps.images.outputs.backend != ''
         run: |
+          # /districts is now behind the OAuth gate; authenticate as a trusted service using
+          # the shared service key (same X-Service-Key the AI service uses) pulled from Secret Manager.
+          SERVICE_KEY=$(gcloud secrets versions access latest --secret=dev-service-api-key)
           count=$(curl --fail --retry 5 --retry-delay 5 \
+            -H "X-Service-Key: $SERVICE_KEY" \
             "${{ vars.API_BASE_URL_DEV }}/districts" | jq 'length')
           if [ "$count" -lt 1 ]; then
             echo "Expected districts data, got count=$count"

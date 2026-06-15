@@ -66,6 +66,38 @@ resource "google_cloud_run_v2_service" "backend" {
         value = "https://${var.ai_domain}"
       }
 
+      env {
+        name  = "GOOGLE_OAUTH_CLIENT_ID"
+        value = var.google_oauth_client_id
+      }
+
+      env {
+        name = "GOOGLE_OAUTH_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = var.google_oauth_client_secret_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "SERVICE_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = var.service_api_key_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      # Parent registrable domain so the session cookie reaches the sibling AI subdomain,
+      # letting the AI service validate the session directly (see AI _verify_session).
+      env {
+        name  = "SESSION_COOKIE_DOMAIN"
+        value = var.session_cookie_domain
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
@@ -173,6 +205,18 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_db_password" {
   member    = "serviceAccount:${google_service_account.cloud_run.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "cloud_run_oauth_client_secret" {
+  secret_id = var.google_oauth_client_secret_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "cloud_run_service_api_key" {
+  secret_id = var.service_api_key_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run.email}"
+}
+
 # AI service — separate service account (no DB access needed)
 resource "google_service_account" "ai_run" {
   account_id   = "${var.environment}-ai-run"
@@ -223,6 +267,24 @@ resource "google_cloud_run_v2_service" "ai" {
         value = "https://${var.backend_domain}"
       }
 
+      # Shared key for the AI's tool calls back into the backend (sent as X-Service-Key).
+      env {
+        name = "SERVICE_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = var.service_api_key_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      # The browser streams directly to this service cross-origin; credentialed CORS needs the
+      # exact app origin(s) (no wildcard). Reuses the same allowlist as the backend.
+      env {
+        name  = "ALLOWED_ORIGINS"
+        value = var.cors_allowed_origins
+      }
+
       resources {
         limits = {
           cpu    = "1"
@@ -269,6 +331,12 @@ resource "google_cloud_run_v2_service_iam_member" "ai_public" {
 
 resource "google_secret_manager_secret_iam_member" "ai_run_google_api_key" {
   secret_id = var.google_api_key_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.ai_run.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "ai_run_service_api_key" {
+  secret_id = var.service_api_key_secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.ai_run.email}"
 }

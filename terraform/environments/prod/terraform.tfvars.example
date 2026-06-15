@@ -12,3 +12,10 @@ frontend_max_instances = 5
 
 backend_image  = "us-docker.pkg.dev/cloudrun/container/hello"
 frontend_image = "us-docker.pkg.dev/cloudrun/container/hello"
+
+# --- Auth (Google OAuth whole-app gate) ---
+# Parent registrable domain shared by example.com / api.example.com / ai-api.example.com.
+session_cookie_domain      = "example.com"
+google_oauth_client_id     = "xxxxxxxx.apps.googleusercontent.com"
+# Supply via TF_VAR_google_oauth_client_secret; do not commit. Empty = no secret version written.
+google_oauth_client_secret = ""

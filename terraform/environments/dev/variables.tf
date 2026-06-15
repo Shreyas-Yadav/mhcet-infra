@@ -75,3 +75,21 @@ variable "google_api_key" {
   sensitive = true
   default   = ""
 }
+
+variable "google_oauth_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "google_oauth_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+# Parent registrable domain for the session cookie (e.g. "example.com") so it reaches the
+# sibling AI subdomain. Must cover frontend_domain, backend_domain, and ai_domain.
+variable "session_cookie_domain" {
+  type    = string
+  default = ""
+}

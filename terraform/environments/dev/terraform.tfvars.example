@@ -16,6 +16,17 @@ ai_domain      = "ai-api-dev.example.com"
 backend_health_url = "https://dev-mhcet-backend-f6dsxixcpq-el.a.run.app/health"
 alert_email    = ""
 
+# --- Auth (Google OAuth whole-app gate) ---
+# Parent registrable domain shared by all three subdomains above, so the session cookie
+# reaches the AI subdomain. For dev.example.com / api-dev.example.com / ai-api-dev.example.com
+# this is "example.com".
+session_cookie_domain = "example.com"
+# OAuth client id (public; usually passed via -var GOOGLE_OAUTH_CLIENT_ID_DEV in CI).
+google_oauth_client_id = "xxxxxxxx.apps.googleusercontent.com"
+# OAuth client secret — supply via TF_VAR_google_oauth_client_secret or a secret tfvars,
+# NOT committed. Leave empty here; set the Secret Manager version out-of-band.
+google_oauth_client_secret = ""
+
 # --- Optional dev load test (see docs/stress-test.md) ---
 # stress_test_enabled             = true
 # rate_limit_requests_per_minute  = 5000   # raise during test; revert to 100 after

@@ -79,3 +79,21 @@ variable "google_api_key" {
   sensitive = true
   default   = ""
 }
+
+variable "google_oauth_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "google_oauth_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+# Parent registrable domain shared by frontend/backend/ai subdomains, so the session cookie
+# reaches the AI subdomain (e.g. "example.com").
+variable "session_cookie_domain" {
+  type    = string
+  default = ""
+}

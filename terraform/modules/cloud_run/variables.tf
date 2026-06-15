@@ -85,6 +85,24 @@ variable "google_api_key_secret_id" {
   type = string
 }
 
+variable "google_oauth_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "google_oauth_client_secret_secret_id" {
+  type = string
+}
+
+variable "service_api_key_secret_id" {
+  type = string
+}
+
+variable "session_cookie_domain" {
+  type    = string
+  default = ""
+}
+
 variable "ai_min_instances" {
   type    = number
   default = 0

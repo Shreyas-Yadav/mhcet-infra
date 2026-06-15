@@ -54,6 +54,8 @@ jobs:
             -var="backend_health_url=${{ vars.API_HEALTH_URL_DEV }}" \
             -var="alert_email=${{ vars.ALERT_EMAIL }}" \
             -var="rate_limit_requests_per_minute=${{ vars.RATE_LIMIT_REQUESTS_PER_MINUTE || 100 }}" \
+            -var="google_oauth_client_id=${{ vars.GOOGLE_OAUTH_CLIENT_ID_DEV }}" \
+            -var="session_cookie_domain=${{ vars.SESSION_COOKIE_DOMAIN_DEV }}" \
             $EXTRA_VARS
 
       - name: Terraform Apply

@@ -31,8 +31,9 @@ data "google_artifact_registry_repository" "mhcet" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  environment    = var.environment
-  google_api_key = var.google_api_key
+  environment                = var.environment
+  google_api_key             = var.google_api_key
+  google_oauth_client_secret = var.google_oauth_client_secret
 }
 
 module "cloud_sql" {
@@ -68,6 +69,11 @@ module "cloud_run" {
   ai_domain                 = var.ai_domain
   backend_domain            = var.backend_domain
   google_api_key_secret_id  = module.secrets.google_api_key_secret_id
+
+  google_oauth_client_id               = var.google_oauth_client_id
+  google_oauth_client_secret_secret_id = module.secrets.google_oauth_client_secret_secret_id
+  service_api_key_secret_id            = module.secrets.service_api_key_secret_id
+  session_cookie_domain                = var.session_cookie_domain
 
   depends_on = [module.cloud_sql, module.secrets]
 }

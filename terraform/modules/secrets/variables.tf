@@ -7,3 +7,9 @@ variable "google_api_key" {
   sensitive = true
   default   = ""
 }
+
+variable "google_oauth_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
