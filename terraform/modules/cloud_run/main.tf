@@ -138,6 +138,15 @@ resource "google_cloud_run_v2_service" "backend" {
       template[0].containers[0].image,
     ]
   }
+
+  # Grant the runtime SA access to every referenced secret BEFORE the service is created,
+  # otherwise the new revision can race ahead of IAM propagation and fail with a
+  # "Permission denied on secret" (Error code 9).
+  depends_on = [
+    google_secret_manager_secret_iam_member.cloud_run_db_password,
+    google_secret_manager_secret_iam_member.cloud_run_oauth_client_secret,
+    google_secret_manager_secret_iam_member.cloud_run_service_api_key,
+  ]
 }
 
 resource "google_cloud_run_v2_service" "frontend" {
@@ -177,6 +186,13 @@ resource "google_cloud_run_v2_service" "frontend" {
       template[0].containers[0].image,
     ]
   }
+
+  # Grant the AI runtime SA access to its secrets before the service is created (avoids the
+  # IAM-propagation race that fails the revision with "Permission denied on secret").
+  depends_on = [
+    google_secret_manager_secret_iam_member.ai_run_google_api_key,
+    google_secret_manager_secret_iam_member.ai_run_service_api_key,
+  ]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "backend_public" {
