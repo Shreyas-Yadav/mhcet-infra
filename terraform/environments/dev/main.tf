@@ -66,6 +66,7 @@ module "cloud_run" {
   ai_image                  = var.ai_image
   ai_domain                 = var.ai_domain
   backend_domain            = var.backend_domain
+  frontend_domain           = var.frontend_domain
   google_api_key_secret_id  = module.secrets.google_api_key_secret_id
 
   google_oauth_client_id               = var.google_oauth_client_id

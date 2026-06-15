@@ -98,6 +98,13 @@ resource "google_cloud_run_v2_service" "backend" {
         value = var.session_cookie_domain
       }
 
+      # After login the backend redirects the browser back to the frontend origin
+      # (a different domain than the backend in cloud).
+      env {
+        name  = "APP_BASE_URL"
+        value = "https://${var.frontend_domain}"
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
